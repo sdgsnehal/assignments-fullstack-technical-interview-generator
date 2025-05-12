@@ -41,8 +41,8 @@ const Jobform = () => {
     try {
       const { data } = await api.post("/api/v1/questions", formData);
 
-      if (Array.isArray(data.questions.questions)) {
-        setResult(data.questions.questions);
+      if (Array.isArray(data.questions)) {
+        setResult(data.questions);
       } else {
         toast.error("Unexpected API response.");
 

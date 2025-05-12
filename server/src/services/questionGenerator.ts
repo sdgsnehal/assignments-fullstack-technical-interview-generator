@@ -6,7 +6,17 @@ export async function generateQuestions(
   experience: string
 ) {
   try {
-    const prompt = `You are a technical interviewer. Generate 3 role-specific interview questions for a ${experience} ${jobTitle} with the following requirements:\n${requirements}\n\nInclude:\n- skill area\n- question\n- difficulty\n- evaluation criteria\nReturn in JSON format.`;
+    const prompt = `You are a technical interviewer. Generate 3 practical, real-world interview questions for a ${experience} ${jobTitle} based on the following job requirements:\n${requirements}\n
+Focus on assessing the candidate's ability to solve problems, write code, debug, or make architectural decisions in real work scenarios — not just definitions or theory.
+
+For each question, return the following in JSON format:
+- skill_area (e.g., JavaScript, React)
+- question (real-world, scenario-based)
+- difficulty (easy, medium, hard — appropriate for the ${experience} level)
+- evaluation_criteria (what a good answer should demonstrate)
+
+Format your output strictly as JSON.`;
+
     console.log(prompt);
     const res = await openai.responses.create({
       model: "gpt-4",
