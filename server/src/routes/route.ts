@@ -1,19 +1,35 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { generateQuestions } from "../services/questionGenerator";
+import { z } from "zod";
 
 const router = express.Router();
+const questionSchema = z.object({
+  jobTitle: z.string().min(2, "Job title is required"),
+  requirements: z.string().min(10, "Requirements are too short"),
+  experience: z.enum(["junior", "mid", "senior"]),
+});
 
-router.post("/questions", async (req, res) => {
-  const { jobTitle, requirements, experience } = req.body;
+router.route("/questions").post(async (req: Request, res: Response) => {
   try {
+    const parsedData = questionSchema.parse(req.body);
+
+    const { jobTitle, requirements, experience } = parsedData;
+
     const questions = await generateQuestions(
       jobTitle,
       requirements,
       experience
     );
-    res.json(questions);
+
+    res.status(200).json({ questions });
   } catch (err) {
-    res.status(500).json({ error: "Failed to generate questions" });
+    if (err instanceof z.ZodError) {
+      res.status(400).json({ error: "Validation failed", details: err.errors });
+      return;
+    }
+
+    console.error("Error generating questions:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
